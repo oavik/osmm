@@ -15,26 +15,32 @@ cat <<-EOH
 	<html><head><meta charset="utf-8"><title>A Region Map</title>
 	<link rel="stylesheet" type="text/css" href="map.css">
 	<style type="text/css">
-	* {
+	body { margin: 100px; }
+	img {
+		display: inline;
+		width: 60px ! important;
+		height: 60px ! important;
 		border: none;
 		margin: 0;
 		padding: 0;
 		white-space: nowrap;
 	}
-	img {
-		display: inline;
-		width: 60px ! important;
-		height: 60px ! important;
+	#mainmap {
+		top: 100px;
+		display: block;
+		width: 600px;
+		height: 610px;
+		border: thin solid red;
 	}
-	div:nth-child(1) {
+	#map > div:nth-child(1) {
 		margin-top: -45px;
 	}
-	div:nth-child(even) {
+	#map > div:nth-child(even) {
 		/* padding-left: 30px; */
 		margin-left: -30px;
 	}
-	div + div {
-		margin-top: -18px;
+	#map > div + div {
+		margin-top: -20px;
 	}
 	map, area {
 		display: none;
@@ -51,7 +57,7 @@ for i in ${nw_halves} ${ne_halves} ${ww_halves} ${ee_halves} ${sw_halves} ${se_h
 done
 	printf '#dummy { opacity: 0.6; }\n'
 
-printf '</style></head><body>'
+printf '</style></head><body><div id="mainmap">'
 
 odd=1
 for i in 0 1 2 3 4 5 6 7 8 9 a b c d e; do
@@ -67,6 +73,8 @@ for i in 0 1 2 3 4 5 6 7 8 9 a b c d e; do
 	fi
 	printf '</div>\n'
 done
+
+printf '</div>\n'
 
 coord_nw="0,15"
 coord_nn="30,0"
