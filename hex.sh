@@ -1,8 +1,4 @@
 #!/bin/sh
-if [ $# -ne 1 ]; then
-	echo Usage: $0 kingdom
-	exit 1
-fi
 
 nw_hexes="00 01 02 03 04 10 11 12 13 20 21 30"
 nw_halves="14 22 31"
@@ -32,10 +28,10 @@ sw_kingdom=$(cat ${kingdom}/SW)
 se_kingdom=$(cat ${kingdom}/SE)
 
 resolve () {
-	nw=${nw_kingdom:-UNKNOWN}
-	ne=${ne_kingdom:-UNKNOWN}
-	sw=${sw_kingdom:-UNKNOWN}
-	se=${se_kingdom:-UNKNOWN}
+	nw=${nw_kingdom:-UNKNOWN-${kingdrom}-NW}
+	ne=${ne_kingdom:-UNKNOWN-${kingdrom}-NE}
+	sw=${sw_kingdom:-UNKNOWN-${kingdrom}-SW}
+	se=${se_kingdom:-UNKNOWN-${kingdrom}-SE}
 	case $1 in
 		# Northwest
 		00)	echo ${nw}-00 ;;
@@ -123,62 +119,81 @@ addtile () {
 	printf '<map name="a%c%c"><area shape="poly" coords="%s" href="%s"></map>' $i $j "${coords}" $(resolve $i$j)
 }
 
-cat <<-EOH
-	<!DOCTYPE html>
-	<html><head><meta charset="utf-8"><title>A Region Map</title>
-	<link rel="stylesheet" type="text/css" href="map.css">
-	<style type="text/css">
-	img {
-		display: inline;
-		width: 60px ! important;
-		height: 60px ! important;
-		border: none;
-		margin: 0;
-		padding: 0;
-		white-space: nowrap;
-	}
-	div:nth-child(1) {
-		margin-top: -45px;
-	}
-	div:nth-child(even) {
-		/* padding-left: 30px; */
-		margin-left: -30px;
-	}
-	div + div {
-		margin-top: -20px;
-	}
-	map, area {
-		display: none;
-	}
-EOH
+header() {
+	tr -d '\n' <<-EOH
+		<!DOCTYPE html>
+		<html><head><meta charset="utf-8"><title>Kingdom Map: $1</title>
+		<link rel="stylesheet" type="text/css" href="map.css">
+		<style type="text/css">
+		img {
+			display: inline;
+			width: 60px ! important;
+			height: 60px ! important;
+			border: none;
+			margin: 0;
+			padding: 0;
+			white-space: nowrap;
+		}
+		div:nth-child(1) {
+			margin-top: -45px;
+		}
+		div:nth-child(even) {
+			/* padding-left: 30px; */
+			margin-left: -30px;
+		}
+		div + div {
+			margin-top: -20px;
+		}
+		map, area {
+			display: none;
+		}
+	EOH
 
-for i in ${nw_hexes} ${ne_hexes} ${sw_hexes} ${se_hexes}; do
-	printf '#i%s,' $i
-done
-	printf '#dummy { opacity: 0.1; }\n'
-
-for i in ${nw_halves} ${ne_halves} ${ww_halves} ${ee_halves} ${sw_halves} ${se_halves}; do
-	printf '#i%s,' $i
-done
-	printf '#dummy { opacity: 0.5; }\n'
-
-printf '</style></head><body>'
-
-odd=1
-for i in 0 1 2 3 4 5 6 7 8 9 a b c d e; do
-	printf '<div>'
-	for j in 0 1 2 3 4 5 6 7 8 9;  do
-		addtile $i $j
+	for i in ${nw_hexes} ${ne_hexes} ${sw_hexes} ${se_hexes}; do
+		printf '#i%s,' $i
 	done
-	if [ $odd -eq 0 ]; then
-		odd=1
-		addtile $i $j
-	else
-		odd=0
-	fi
-	printf '</div>\n'
-done
+		printf '#dummy { opacity: 0.1; }'
 
-cat <<-EOF
-	</body></html>
-EOF
+	for i in ${nw_halves} ${ne_halves} ${ww_halves} ${ee_halves} ${sw_halves} ${se_halves}; do
+		printf '#i%s,' $i
+	done
+		printf '#dummy { opacity: 0.5; }'
+
+	printf '</style></head><body>'
+}
+
+footer () {
+	tr -d '\n' <<-EOF
+		</body></html>
+	EOF
+}
+
+tiles () {
+	odd=1
+	for i in 0 1 2 3 4 5 6 7 8 9 a b c d e; do
+		printf '<div>'
+		for j in 0 1 2 3 4 5 6 7 8 9;  do
+			addtile $i $j
+		done
+		if [ $odd -eq 0 ]; then
+			odd=1
+			addtile $i $j
+		else
+			odd=0
+		fi
+		printf '</div>\n'
+	done
+}
+
+main() {
+	if [ $# -ne 1 ]; then
+		echo Usage: $0 kingdom
+		exit 1
+	fi
+
+	header ${kingdom}
+	tiles
+	footer
+}
+
+main $@
