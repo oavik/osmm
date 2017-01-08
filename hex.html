@@ -2,34 +2,28 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Kingdom Map</title>
-<base target="_parent">
+<title>Map</title>
 <style type="text/css">
 * { overflow: hidden; border: none; margin: 0; padding: 0; white-space: nowrap; }
+img { opacity: 0.5 }
 </style>
 <script type="text/javascript"><!--
 var hexsize = 60;
+var centerhex = { x: -1, y: -1 };
 
-function receivejson ()
-{
-	jsonresponse = this.responseText;
-	console.log(this.responseURL);
-	console.log(this.responseText);
-}
-
-function getjson(path)
+function getjson(path, action)
 {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", path);
-	xhr.onload = receivejson;
+	xhr.onload = action;
 	xhr.send();
 }
 
 function gettile(x, y)
 {
-	var terrain="grass";
+	var terrain = ["grass", "desert", "ocean", "lake", "hill", "mountain"];
 	var img = document.createElement("img");
-	img.src = terrain + ".png";
+	img.src = terrain[Math.floor((Math.random() * terrain.length)) % terrain.length] + ".png";
 	img.id = "i" + x + "-" + y;
 	img.useMap = "#a" + x + "-" + y;
 	img.style.display = "inline";
@@ -38,7 +32,7 @@ function gettile(x, y)
 	return img;
 }
 
-function getmap(x, y)
+function getclickarea(x, y)
 {
 	var coord_nw = "0," + (hexsize/4);
 	var coord_nn = (hexsize/2) + ",0";
@@ -46,42 +40,53 @@ function getmap(x, y)
 	var coord_se = hexsize + "," + (hexsize*3/4);
 	var coord_ss = (hexsize/2) + "," + hexsize;
 	var coord_sw = "0," + (hexsize*3/4);
+
 	var map = document.createElement("map");
 	map.style.display = "none";
 	map.name = "a" + x + "-" + y;
+
 	var area = document.createElement("area");
 	area.style.display = "none";
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
-	area.href = "FIXME-" + x + "-" + y;
+	area.href = "#" + x + "/" + y;
+	area.onClick = "recenter();";
+	area.ondblclick = "zoomto();";
 	map.appendChild(area);
+
 	return map;
+}
+
+function zoomto(e)
+{
+	console.log("zooming to");
+	console.log(e);
 }
 
 function drawmap(width, height)
 {
+	var body = document.getElementsByTagName("body");
+	for (var i = 0; i < height; i++) {
+		var div = document.createElement("div");
+		div.style.marginTop = "-" + (hexsize/3) + "px";
+		for (var j = 0; j < width; j++) {
+			div.appendChild(gettile(j, i));
+			div.appendChild(getclickarea(j, i));
+		}
+		if (i % 2 == 1) {
+			div.style.marginLeft = "-" + (hexsize/2) + "px";
+		}
+		body[0].appendChild(div);
+	}
+
+	/* for 10-hex wide hexes */
+	/*
 	var nw_halves=['1-4', '2-2', '3-1'];
 	var ne_halves=['1-6', '2-7', '3-9'];
 	var ww_halves=['5-0', '7-0', '9-0'];
 	var ee_halves=['5-10', '7-10', '9-10'];
 	var sw_halves=['11-1', '12-2', '13-4'];
 	var se_halves=['11-9', '12-7', '13-6'];
-
-	var body = document.getElementsByTagName("body");
-	for (var i = 0; i < height; i++) {
-		var div = document.createElement("div");
-		div.style.marginTop = "-" + (hexsize/3) + "px";
-		for (var j = 0; j < width; j++) {
-			div.appendChild(gettile(i, j));
-			div.appendChild(getmap(i, j));
-		}
-		if (i % 2 == 1) {
-			div.appendChild(gettile(i, 0xa));
-			div.appendChild(getmap(i, 0xa));
-			div.style.marginLeft = "-" + (hexsize/2) + "px";
-		}
-		body[0].appendChild(div);
-	}
 
 	var halves = nw_halves.concat(ne_halves).concat(ww_halves).concat(ee_halves).concat(sw_halves).concat(se_halves);
 	for (var h in halves) {
@@ -90,24 +95,45 @@ function drawmap(width, height)
 			e.style.opacity = 0.5;
 		}
 	}
+	*/
 }
 
-function recenter ()
+function drawhexes()
 {
-	var hexestall = 13;
-	var hexeswide = 10;
-	var centery = 6;
-	var centerx = 6;
-	var rcenterx = 7;
-	var rcentery = 7;
 	var hexwidth = window.innerWidth / hexsize;
-	var hexheight = window.innerHeight / (hexsize * .75);
-	drawmap(Math.ceil(hexwidth), Math.ceil(hexheight) + 2);
-	getjson("/0/0.json");
+	var hexheight = window.innerHeight / (hexsize * 3 / 4);
+	drawmap(Math.ceil(hexwidth), Math.ceil(hexheight) + 1);
+}
+
+function worldmap()
+{
+	var world = JSON.parse(this.responseText);
+	if (centerhex.x == -1) {
+		centerhex.x = Math.floor(world.width / 2);
+	}
+	if (centerhex.y == -1) {
+		centerhex.y = Math.floor(world.height / 2);
+	}
+	console.log(world);
+	console.log(centerhex);
+	var centertile = document.getElementById("i" + centerhex.x + "-" + centerhex.y);
+	centertile.style.opacity = 1.0;
+}
+
+function recenter()
+{
+	if (window.location.href.indexOf("#") == -1) {
+		getjson("/world.json", worldmap);
+	} else {
+		console.log("Map of " + hash);
+		var hash = window.location.href.substring(window.location.href.indexOf("#") + 1);
+		var centerhex = hash.split("/");
+		console.log(centerhex);
+	}
 }
 
 // --></script>
 </head>
-<body onload="recenter();">
+<body onload="drawhexes(); recenter();">
 </body>
 </html>
