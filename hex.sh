@@ -124,7 +124,7 @@ header() {
 	tr -d '\n' <<-EOH
 		<!DOCTYPE html>
 		<html><head><meta charset="utf-8"><title>Kingdom Map: $1</title>
-		<link rel="stylesheet" type="text/css" href="map.css">
+		<link rel="stylesheet" href="map.css">
 		<style type="text/css">
 		img {
 			display: inline;
@@ -149,11 +149,6 @@ header() {
 			display: none;
 		}
 	EOH
-
-	for i in ${nw_hexes} ${ne_hexes} ${sw_hexes} ${se_hexes}; do
-		printf '#i%s,' $i
-	done
-		printf '#dummy { opacity: 0.3; }'
 
 	for i in ${nw_halves} ${ne_halves} ${ww_halves} ${ee_halves} ${sw_halves} ${se_halves}; do
 		printf '#i%s,' $i
