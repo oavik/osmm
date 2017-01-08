@@ -5,13 +5,28 @@
 <title>Kingdom Map</title>
 <base target="_parent">
 <style type="text/css">
-body, div { overflow: hidden; margin: 0; padding: 0; white-space: nowrap; }
+body, div { overflow: hidden; }
 * { border: none; margin: 0; padding: 0; white-space: nowrap; }
 div:nth-child(1) { margin-top: -45px; }
 div:nth-child(even) { margin-left: -30px; }
 div + div { margin-top: -20px; }
 </style>
 <script type="text/javascript"><!--
+function receivejson ()
+{
+	jsonresponse = this.responseText;
+	console.log(this.responseURL);
+	console.log(this.responseText);
+}
+
+function getjson(path)
+{
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", path);
+	xhr.onload = receivejson;
+	xhr.send();
+}
+
 function gettile(x, y)
 {
 	var terrain="grass";
@@ -89,8 +104,8 @@ function recenter ()
 	var rcentery = 7;
 	var hexwidth = window.innerWidth / hexsize;
 	var hexheight = window.innerHeight / (hexsize * .75);
-	console.log("Screen is " + hexwidth + " hexes wide by " + hexheight + " hexes tall");
 	drawmap(Math.ceil(hexwidth), Math.ceil(hexheight) + 2);
+	getjson("/0/0.json");
 }
 
 // --></script>
