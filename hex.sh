@@ -1,4 +1,9 @@
 #!/bin/sh
+if [ $# -ne 1 ]; then
+	echo Usage: $0 kingdom
+	exit 1
+fi
+
 nw_hexes="00 01 02 03 04 10 11 12 13 20 21 30"
 nw_halves="14 22 31"
 ne_hexes="05 06 07 08 09 17 18 19 1a 28 29 2a 3a"
@@ -18,82 +23,104 @@ coord_ss="30,60"
 coord_sw="0,45"
 coords="${coord_nw},${coord_nn},${coord_ne},${coord_se},${coord_ss},${coord_sw}"
 
-terrain=${1:-grass.png}
+kingdom=${1}
+nw_kingdom=$(cat ${kingdom}/NW)
+ne_kingdom=$(cat ${kingdom}/NE)
+ww_kingdom=$(cat ${kingdom}/WW)
+ee_kingdom=$(cat ${kingdom}/EE)
+sw_kingdom=$(cat ${kingdom}/SW)
+se_kingdom=$(cat ${kingdom}/SE)
 
 resolve () {
+	nw=${nw_kingdom:-UNKNOWN}
+	ne=${ne_kingdom:-UNKNOWN}
+	sw=${sw_kingdom:-UNKNOWN}
+	se=${se_kingdom:-UNKNOWN}
 	case $1 in
 		# Northwest
-		00)	echo NW-00 ;;
-		01)	echo NW-01 ;;
-		02)	echo NW-02 ;;
-		03)	echo NW-03 ;;
-		04)	echo NW-04 ;;
+		00)	echo ${nw}-00 ;;
+		01)	echo ${nw}-01 ;;
+		02)	echo ${nw}-02 ;;
+		03)	echo ${nw}-03 ;;
+		04)	echo ${nw}-04 ;;
 
-		10)	echo NW-b5 ;;
-		11)	echo NW-b6 ;;
-		12)	echo NW-b7 ;;
-		13)	echo NW-b8 ;;
+		10)	echo ${nw}-b5 ;;
+		11)	echo ${nw}-b6 ;;
+		12)	echo ${nw}-b7 ;;
+		13)	echo ${nw}-b8 ;;
 
-		20)	echo NW-c5 ;;
-		21)	echo NW-c6 ;;
+		20)	echo ${nw}-c5 ;;
+		21)	echo ${nw}-c6 ;;
 
-		30)	echo NW-d5 ;;
+		30)	echo ${nw}-d5 ;;
 
 		# Northeast
-		05)	echo NE-a0 ;;
-		06)	echo NE-a1 ;;
-		07)	echo NE-a2 ;;
-		08)	echo NE-a3 ;;
-		09)	echo NE-a4 ;;
+		05)	echo ${ne}-a0 ;;
+		06)	echo ${ne}-a1 ;;
+		07)	echo ${ne}-a2 ;;
+		08)	echo ${ne}-a3 ;;
+		09)	echo ${ne}-a4 ;;
 
-		17)	echo NE-b2 ;;
-		18)	echo NE-b3 ;;
-		19)	echo NE-b4 ;;
-		1a)	echo NE-b5 ;;
+		17)	echo ${ne}-b2 ;;
+		18)	echo ${ne}-b3 ;;
+		19)	echo ${ne}-b4 ;;
+		1a)	echo ${ne}-b5 ;;
 
-		28)	echo NE-c3 ;;
-		29)	echo NE-c4 ;;
+		28)	echo ${ne}-c3 ;;
+		29)	echo ${ne}-c4 ;;
 
-		3a)	echo NE-d5 ;;
+		3a)	echo ${ne}-d5 ;;
 
 		# Southwest
-		b0)	echo SW-15 ;;
+		b0)	echo ${sw}-15 ;;
 
-		c0)	echo SW-25 ;;
-		c1)	echo SW-26 ;;
+		c0)	echo ${sw}-25 ;;
+		c1)	echo ${sw}-26 ;;
 
-		d0)	echo SW-35 ;;
-		d1)	echo SW-36 ;;
-		d2)	echo SW-37 ;;
-		d3)	echo SW-38 ;;
+		d0)	echo ${sw}-35 ;;
+		d1)	echo ${sw}-36 ;;
+		d2)	echo ${sw}-37 ;;
+		d3)	echo ${sw}-38 ;;
 
-		e0)	echo SW-45 ;;
-		e1)	echo SW-46 ;;
-		e2)	echo SW-47 ;;
-		e3)	echo SW-48 ;;
-		e4)	echo SW-49 ;;
+		e0)	echo ${sw}-45 ;;
+		e1)	echo ${sw}-46 ;;
+		e2)	echo ${sw}-47 ;;
+		e3)	echo ${sw}-48 ;;
+		e4)	echo ${sw}-49 ;;
 
 		# Southeast
-		ba)	echo SE-15 ;;
+		ba)	echo ${se}-15 ;;
 
-		c8)	echo SE-23 ;;
-		c9)	echo SE-24 ;;
-		ca)	echo SE-25 ;;
+		c8)	echo ${se}-23 ;;
+		c9)	echo ${se}-24 ;;
+		ca)	echo ${se}-25 ;;
 
-		d7)	echo SE-32 ;;
-		d8)	echo SE-33 ;;
-		d9)	echo SE-34 ;;
-		da)	echo SE-35 ;;
+		d7)	echo ${se}-32 ;;
+		d8)	echo ${se}-33 ;;
+		d9)	echo ${se}-34 ;;
+		da)	echo ${se}-35 ;;
 
-		e5)	echo SE-40 ;;
-		e6)	echo SE-41 ;;
-		e7)	echo SE-42 ;;
-		e8)	echo SE-43 ;;
-		e9)	echo SE-44 ;;
+		e5)	echo ${se}-40 ;;
+		e6)	echo ${se}-41 ;;
+		e7)	echo ${se}-42 ;;
+		e8)	echo ${se}-43 ;;
+		e9)	echo ${se}-44 ;;
 
 		# This hex
 		*)	echo $1 ;;	
 	esac
+}
+
+addtile () {
+	if [ -f ${kingdom}/$1$2/terrain ]; then
+		terrain=$(cat ${kingdom}/$1$2/terrain)
+	elif [ -f ${kingdom}/terrain ]; then
+		terrain=$(cat ${kingdom}/terrain)
+	else
+		terrain=unkown
+	fi
+	printf '<img id="i%c%c" src="%s.png" usemap="#a%c%c">' $1 $2 $terrain $1 $2
+	printf '<map name="a%c%c"><area shape="poly" coords="%s" href="%s"></map>' $i $j "${coords}" $(resolve $i$j)
 }
 
 cat <<-EOH
@@ -141,13 +168,11 @@ odd=1
 for i in 0 1 2 3 4 5 6 7 8 9 a b c d e; do
 	printf '<div>'
 	for j in 0 1 2 3 4 5 6 7 8 9;  do
-		printf '<img id="i%c%c" src="%s" usemap="#a%c%c">' $i $j $terrain $i $j
-		printf '<map name="a%c%c"><area shape="poly" coords="%s" href="%s"></map>' $i $j "${coords}" $(resolve $i$j)
+		addtile $i $j
 	done
 	if [ $odd -eq 0 ]; then
 		odd=1
-		printf '<img id="i%c%c" src="%s" usemap="#a%c%c">' $i a $terrain $i a
-		printf '<map name="a%c%c"><area shape="poly" coords="%s" href="%s"></map>' $i a "${coords}" $(resolve ${i}a)
+		addtile $i $j
 	else
 		odd=0
 	fi
