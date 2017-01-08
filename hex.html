@@ -5,25 +5,28 @@
 <title>Kingdom Map</title>
 <base target="_parent">
 <style type="text/css">
+body, div { overflow: hidden; margin: 0; padding: 0; white-space: nowrap; }
 * { border: none; margin: 0; padding: 0; white-space: nowrap; }
-img { display: inline; width: 60px ! important; height: 60px ! important; }
 div:nth-child(1) { margin-top: -45px; }
 div:nth-child(even) { margin-left: -30px; }
 div + div { margin-top: -20px; }
-map, area { display: none; }
 </style>
 <script type="text/javascript"><!--
-function gettile(x, y) {
+function gettile(x, y)
+{
 	var terrain="grass";
 	var img = document.createElement("img");
 	img.src = terrain + ".png";
 	img.id = "i" + x + "-" + y;
 	img.useMap = "#a" + x + "-" + y;
-	console.log(img);
+	img.style.display = "inline";
+	img.style.width = "60px";
+	img.style.height = "60px";
 	return img;
 }
 
-function getmap(x, y) {
+function getmap(x, y)
+{
 	var coord_nw="0,15";
 	var coord_nn="30,0";
 	var coord_ne="60,15";
@@ -31,8 +34,10 @@ function getmap(x, y) {
 	var coord_ss="30,60";
 	var coord_sw="0,45";
 	var map = document.createElement("map");
+	map.style.display = "none";
 	map.name = "a" + x + "-" + y;
 	var area = document.createElement("area");
+	area.style.display = "none";
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
 	area.href = "FIXME-" + x + "-" + y;
@@ -40,7 +45,8 @@ function getmap(x, y) {
 	return map;
 }
 
-function drawmap() {
+function drawmap(width, height)
+{
 	var nw_halves=['1-4', '2-2', '3-1'];
 	var ne_halves=['1-6', '2-7', '3-9'];
 	var ww_halves=['5-0', '7-0', '9-0'];
@@ -49,9 +55,10 @@ function drawmap() {
 	var se_halves=['11-9', '12-7', '13-6'];
 
 	var body = document.getElementsByTagName("body");
-	for (var i = 0; i < 0xf; i++) {
+	for (var i = 0; i < height; i++) {
 		var div = document.createElement("div");
-		for (var j = 0; j < 0xa; j++) {
+		div.style.top = "-20px";
+		for (var j = 0; j < width; j++) {
 			div.appendChild(gettile(i, j));
 			div.appendChild(getmap(i, j));
 		}
@@ -70,8 +77,24 @@ function drawmap() {
 		}
 	}
 }
+
+function recenter ()
+{
+	var hexestall = 13;
+	var hexeswide = 10;
+	var hexsize = 60;
+	var centery = 6;
+	var centerx = 6;
+	var rcenterx = 7;
+	var rcentery = 7;
+	var hexwidth = window.innerWidth / hexsize;
+	var hexheight = window.innerHeight / (hexsize * .75);
+	console.log("Screen is " + hexwidth + " hexes wide by " + hexheight + " hexes tall");
+	drawmap(Math.ceil(hexwidth), Math.ceil(hexheight) + 2);
+}
+
 // --></script>
 </head>
-<body onload="drawmap();">
+<body onload="recenter();">
 </body>
 </html>
