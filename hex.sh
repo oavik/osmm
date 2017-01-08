@@ -56,6 +56,42 @@ resolve () {
 
 		3a)	echo NE-d5 ;;
 
+		# Southwest
+		b0)	echo SW-15 ;;
+
+		c0)	echo SW-25 ;;
+		c1)	echo SW-26 ;;
+
+		d0)	echo SW-35 ;;
+		d1)	echo SW-36 ;;
+		d2)	echo SW-37 ;;
+		d3)	echo SW-38 ;;
+
+		e0)	echo SW-45 ;;
+		e1)	echo SW-46 ;;
+		e2)	echo SW-47 ;;
+		e3)	echo SW-48 ;;
+		e4)	echo SW-49 ;;
+
+		# Southeast
+		ba)	echo SE-15 ;;
+
+		c8)	echo SE-23 ;;
+		c9)	echo SE-24 ;;
+		ca)	echo SE-25 ;;
+
+		d7)	echo SE-32 ;;
+		d8)	echo SE-33 ;;
+		d9)	echo SE-34 ;;
+		da)	echo SE-35 ;;
+
+		e5)	echo SE-40 ;;
+		e6)	echo SE-41 ;;
+		e7)	echo SE-42 ;;
+		e8)	echo SE-43 ;;
+		e9)	echo SE-44 ;;
+
+		# This hex
 		*)	echo $1 ;;	
 	esac
 }
@@ -119,8 +155,5 @@ for i in 0 1 2 3 4 5 6 7 8 9 a b c d e; do
 done
 
 cat <<-EOF
-	<map name="nw">
-		<area shape="poly" coords="${coords}" href="../${nw}">
-	</map>
 	</body></html>
 EOF
