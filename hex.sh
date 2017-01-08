@@ -108,15 +108,16 @@ resolve () {
 }
 
 addtile () {
-	if [ -f ${kingdom}/$1$2/terrain ]; then
-		terrain=$(cat ${kingdom}/$1$2/terrain)
-	elif [ -f ${kingdom}/terrain ]; then
-		terrain=$(cat ${kingdom}/terrain)
+	tiledir=$(resolve $1$2)
+	if [ -f ${tiledir}/terrain ]; then
+		terrain=$(cat ${tiledir}/terrain)
+	elif [ -f $(dirname ${tiledir})/terrain ]; then
+		terrain=$(cat $(dirname ${tiledir})/terrain)
 	else
 		terrain=unkown
 	fi
 	printf '<img id="i%c%c" src="%s.png" usemap="#a%c%c">' $1 $2 $terrain $1 $2
-	printf '<map name="a%c%c"><area shape="poly" coords="%s" href="%s"></map>' $i $j "${coords}" $(resolve $i$j)
+	printf '<map name="a%c%c"><area shape="poly" coords="%s" href="%s"></map>' $1 $2 "${coords}" "${tiledir}"
 }
 
 header() {
@@ -152,7 +153,7 @@ header() {
 	for i in ${nw_hexes} ${ne_hexes} ${sw_hexes} ${se_hexes}; do
 		printf '#i%s,' $i
 	done
-		printf '#dummy { opacity: 0.1; }'
+		printf '#dummy { opacity: 0.3; }'
 
 	for i in ${nw_halves} ${ne_halves} ${ww_halves} ${ee_halves} ${sw_halves} ${se_halves}; do
 		printf '#i%s,' $i
