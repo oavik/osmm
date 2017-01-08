@@ -9,6 +9,7 @@
 <script type="text/javascript"><!--
 var hexsize = 60;
 var centerhex = { x: -1, y: -1 };
+var offset = { x: 0, y: 0 };
 
 function getjson(path, action)
 {
@@ -47,7 +48,6 @@ function getclickarea(x, y)
 	area.id = "a" + x + "-" + y;
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
-	//area.href = "#NO" + x + "/" + y;
 	area.onClick = "recenter();";
 	area.ondblclick = "zoomto();";
 	map.appendChild(area);
@@ -109,15 +109,34 @@ function settile(x, y, terrain, href)
 {
 	var tile = document.getElementById("i" + x + "-" + y);
 	var area = document.getElementById("a" + x + "-" + y);
-	tile.src = terrain;
+	tile.src = terrain + ".png";
 	area.href = href;
+}
+
+function fixtile()
+{
+	//var tilenumber = this.responseURL;
+	/* start at .json, count back two slashes */
+	/* if more, count back two more */
+	/* if more, count back two more */
+	console.log(this.responseText);
+	var tile = JSON.parse(this.responseText);
+	var x = 0;
+	var y = 0;
+	settile(x + offset.x, y + offset.y, tile.terrain, this.reponseURL);
 }
 
 function worldmap()
 {
 	var world = JSON.parse(this.responseText);
+	var worldcenterx = Math.floor(world.width / 2);
+	var worldcentery = Math.floor(world.height / 2);
+	offset.x = worldcenterx - centerhex.x;
+	offset.y = worldcentery - centerhex.y;
+	//console.log(offset);
 
-	settile(centerhex.x, centerhex.y, "grass.png", "#" + centerhex.x + "/" + centerhex.y);
+	settile(centerhex.x, centerhex.y, "grass", "#" + worldcenterx + "/" + worldcentery);
+	getjson("/0/0.json", fixtile);
 }
 
 function recenter()
