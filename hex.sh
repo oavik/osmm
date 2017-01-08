@@ -30,11 +30,11 @@ resolve () {
 	se=${se_kingdom:-UNKNOWN-${kingdom}-SE}
 	case $1 in
 		# Northwest
-		00)	echo ${nw}/00 ;;
-		01)	echo ${nw}/01 ;;
-		02)	echo ${nw}/02 ;;
-		03)	echo ${nw}/03 ;;
-		04)	echo ${nw}/04 ;;
+		00)	echo ${nw}/a5 ;;
+		01)	echo ${nw}/a6 ;;
+		02)	echo ${nw}/a7 ;;
+		03)	echo ${nw}/a8 ;;
+		04)	echo ${nw}/a9 ;;
 
 		10)	echo ${nw}/b5 ;;
 		11)	echo ${nw}/b6 ;;
@@ -119,7 +119,11 @@ addtile () {
 header() {
 	tr -d '\n' <<-EOH
 		<!DOCTYPE html>
-		<html><head><meta charset="utf-8"><title>Kingdom Map: $1</title>
+		<html>
+		<head>
+		<meta charset="utf-8">
+		<title>Kingdom Map: $1</title>
+		<base target="_parent">
 		<style type="text/css">
 		* {
 			border: none;
