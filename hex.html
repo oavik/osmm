@@ -5,13 +5,11 @@
 <title>Kingdom Map</title>
 <base target="_parent">
 <style type="text/css">
-body, div { overflow: hidden; }
-* { border: none; margin: 0; padding: 0; white-space: nowrap; }
-div:nth-child(1) { margin-top: -45px; }
-div:nth-child(even) { margin-left: -30px; }
-div + div { margin-top: -20px; }
+* { overflow: hidden; border: none; margin: 0; padding: 0; white-space: nowrap; }
 </style>
 <script type="text/javascript"><!--
+var hexsize = 60;
+
 function receivejson ()
 {
 	jsonresponse = this.responseText;
@@ -35,19 +33,19 @@ function gettile(x, y)
 	img.id = "i" + x + "-" + y;
 	img.useMap = "#a" + x + "-" + y;
 	img.style.display = "inline";
-	img.style.width = "60px";
-	img.style.height = "60px";
+	img.style.width = hexsize + "px";
+	img.style.height = hexsize + "px";
 	return img;
 }
 
 function getmap(x, y)
 {
-	var coord_nw="0,15";
-	var coord_nn="30,0";
-	var coord_ne="60,15";
-	var coord_se="60,45";
-	var coord_ss="30,60";
-	var coord_sw="0,45";
+	var coord_nw = "0," + (hexsize/4);
+	var coord_nn = (hexsize/2) + ",0";
+	var coord_ne = hexsize + "," + (hexsize/4);
+	var coord_se = hexsize + "," + (hexsize*3/4);
+	var coord_ss = (hexsize/2) + "," + hexsize;
+	var coord_sw = "0," + (hexsize*3/4);
 	var map = document.createElement("map");
 	map.style.display = "none";
 	map.name = "a" + x + "-" + y;
@@ -72,7 +70,7 @@ function drawmap(width, height)
 	var body = document.getElementsByTagName("body");
 	for (var i = 0; i < height; i++) {
 		var div = document.createElement("div");
-		div.style.top = "-20px";
+		div.style.marginTop = "-" + (hexsize/3) + "px";
 		for (var j = 0; j < width; j++) {
 			div.appendChild(gettile(i, j));
 			div.appendChild(getmap(i, j));
@@ -80,6 +78,7 @@ function drawmap(width, height)
 		if (i % 2 == 1) {
 			div.appendChild(gettile(i, 0xa));
 			div.appendChild(getmap(i, 0xa));
+			div.style.marginLeft = "-" + (hexsize/2) + "px";
 		}
 		body[0].appendChild(div);
 	}
@@ -97,7 +96,6 @@ function recenter ()
 {
 	var hexestall = 13;
 	var hexeswide = 10;
-	var hexsize = 60;
 	var centery = 6;
 	var centerx = 6;
 	var rcenterx = 7;
