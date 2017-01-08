@@ -16,6 +16,7 @@ function getjson(path, action)
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", path);
 	xhr.onload = action;
+	xhr.onerror = function() { return true; };
 	xhr.send();
 }
 
@@ -107,6 +108,7 @@ function drawhexes()
 
 function settile(x, y, terrain, href)
 {
+	console.log("Setting tile " + x + "," + y);
 	var tile = document.getElementById("i" + x + "-" + y);
 	var area = document.getElementById("a" + x + "-" + y);
 	tile.src = terrain + ".png";
@@ -115,28 +117,34 @@ function settile(x, y, terrain, href)
 
 function fixtile()
 {
-	//var tilenumber = this.responseURL;
+	var tileparts = this.responseURL.split("/");
+	console.log(tileparts);
 	/* start at .json, count back two slashes */
 	/* if more, count back two more */
 	/* if more, count back two more */
-	console.log(this.responseText);
-	var tile = JSON.parse(this.responseText);
-	var x = 0;
-	var y = 0;
-	settile(x + offset.x, y + offset.y, tile.terrain, this.reponseURL);
+	//console.log(this.responseText);
+	//var tile = JSON.parse(this.responseText);
+	var x = tileparts[tileparts.length-2];
+	var y = tileparts[tileparts.length-1].substr(0, tileparts[tileparts.length-1].indexOf(".json"));
+	console.log(x + "," + y);
+	settile(x - offset.x, y - offset.y, this.responseText, this.reponseURL);
 }
 
 function worldmap()
 {
-	var world = JSON.parse(this.responseText);
+	var world = { width: 400, height: 267 };
+	if (this.status == 200) {
+		world = JSON.parse(this.responseText);
+	}
 	var worldcenterx = Math.floor(world.width / 2);
 	var worldcentery = Math.floor(world.height / 2);
 	offset.x = worldcenterx - centerhex.x;
 	offset.y = worldcentery - centerhex.y;
-	//console.log(offset);
 
-	settile(centerhex.x, centerhex.y, "grass", "#" + worldcenterx + "/" + worldcentery);
-	getjson("/0/0.json", fixtile);
+	//settile(centerhex.x, centerhex.y, "grass", "#" + worldcenterx + "/" + worldcentery);
+	getjson("/200/132.json", fixtile);
+	getjson("/200/133.json", fixtile);
+	getjson("/200/134.json", fixtile);
 }
 
 function recenter()
