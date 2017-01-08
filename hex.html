@@ -13,36 +13,53 @@ div + div { margin-top: -20px; }
 map, area { display: none; }
 </style>
 <script type="text/javascript"><!--
-function addtile(x, y) {
+function gettile(x, y) {
 	var terrain="grass";
+	var img = document.createElement("img");
+	img.src = terrain + ".png";
+	img.id = "i" + x + "-" + y;
+	img.useMap = "#a" + x + "-" + y;
+	console.log(img);
+	return img;
+}
+
+function getmap(x, y) {
 	var coord_nw="0,15";
 	var coord_nn="30,0";
 	var coord_ne="60,15";
 	var coord_se="60,45";
 	var coord_ss="30,60";
 	var coord_sw="0,45";
-	var coords=coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
-	document.write('<img id="i' + x + "-" + y + '" src="' + terrain + '.png" usemap="#a' + x + "-" + y + '">');
-	document.write('<map name="a' + x + "-" + y + '"><area shape="poly" coords="' + coords + '" href="FIXME-' + x + "-" + y + '"></map>');
+	var map = document.createElement("map");
+	map.name = "a" + x + "-" + y;
+	var area = document.createElement("area");
+	area.shape = "poly";
+	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
+	area.href = "FIXME-" + x + "-" + y;
+	map.appendChild(area);
+	return map;
 }
 
 function drawmap() {
 	var nw_halves=['1-4', '2-2', '3-1'];
 	var ne_halves=['1-6', '2-7', '3-9'];
 	var ww_halves=['5-0', '7-0', '9-0'];
-	var ee_halves=['5-a', '7-a', '9-a'];
-	var sw_halves=['b-1', 'c-2', 'd-4'];
-	var se_halves=['b-9', 'c-7', 'd-6'];
+	var ee_halves=['5-11', '7-11', '9-11'];
+	var sw_halves=['12-1', '13-2', '14-4'];
+	var se_halves=['12-9', '13-7', '14-6'];
 
+	var body = document.getElementsByTagName("body");
 	for (var i = 0; i < 0xf; i++) {
-		document.write("<div>");
+		var div = document.createElement("div");
 		for (var j = 0; j < 0xa; j++) {
-			addtile(i, j);
+			div.appendChild(gettile(i, j));
+			div.appendChild(getmap(i, j));
 		}
-		if (i % 2 == 0) {
-			addtile(i, 0xa);
+		if (i % 2 == 1) {
+			div.appendChild(gettile(i, 0xa));
+			div.appendChild(getmap(i, 0xa));
 		}
-		document.write("</div>");
+		body[0].appendChild(div);
 	}
 
 	var halves = nw_halves.concat(ne_halves).concat(ww_halves).concat(ee_halves).concat(sw_halves).concat(se_halves);
@@ -55,101 +72,6 @@ function drawmap() {
 }
 // --></script>
 </head>
-<body>
-
-<!--
-
-kingdom=${1}
-nw_kingdom=$(cat ${kingdom}/NW)
-ne_kingdom=$(cat ${kingdom}/NE)
-ww_kingdom=$(cat ${kingdom}/WW)
-ee_kingdom=$(cat ${kingdom}/EE)
-sw_kingdom=$(cat ${kingdom}/SW)
-se_kingdom=$(cat ${kingdom}/SE)
-
-resolve () {
-	nw=${nw_kingdom:-UNKNOWN-${kingdom}-NW}
-	ne=${ne_kingdom:-UNKNOWN-${kingdom}-NE}
-	sw=${sw_kingdom:-UNKNOWN-${kingdom}-SW}
-	se=${se_kingdom:-UNKNOWN-${kingdom}-SE}
-	case $1 in
-		# Northwest
-		00)	echo ${nw}/a5 ;;
-		01)	echo ${nw}/a6 ;;
-		02)	echo ${nw}/a7 ;;
-		03)	echo ${nw}/a8 ;;
-		04)	echo ${nw}/a9 ;;
-
-		10)	echo ${nw}/b5 ;;
-		11)	echo ${nw}/b6 ;;
-		12)	echo ${nw}/b7 ;;
-		13)	echo ${nw}/b8 ;;
-
-		20)	echo ${nw}/c5 ;;
-		21)	echo ${nw}/c6 ;;
-
-		30)	echo ${nw}/d5 ;;
-
-		# Northeast
-		05)	echo ${ne}/a0 ;;
-		06)	echo ${ne}/a1 ;;
-		07)	echo ${ne}/a2 ;;
-		08)	echo ${ne}/a3 ;;
-		09)	echo ${ne}/a4 ;;
-
-		17)	echo ${ne}/b2 ;;
-		18)	echo ${ne}/b3 ;;
-		19)	echo ${ne}/b4 ;;
-		1a)	echo ${ne}/b5 ;;
-
-		28)	echo ${ne}/c3 ;;
-		29)	echo ${ne}/c4 ;;
-
-		3a)	echo ${ne}/d5 ;;
-
-		# Southwest
-		b0)	echo ${sw}/15 ;;
-
-		c0)	echo ${sw}/25 ;;
-		c1)	echo ${sw}/26 ;;
-
-		d0)	echo ${sw}/35 ;;
-		d1)	echo ${sw}/36 ;;
-		d2)	echo ${sw}/37 ;;
-		d3)	echo ${sw}/38 ;;
-
-		e0)	echo ${sw}/45 ;;
-		e1)	echo ${sw}/46 ;;
-		e2)	echo ${sw}/47 ;;
-		e3)	echo ${sw}/48 ;;
-		e4)	echo ${sw}/49 ;;
-
-		# Southeast
-		ba)	echo ${se}/15 ;;
-
-		c8)	echo ${se}/23 ;;
-		c9)	echo ${se}/24 ;;
-		ca)	echo ${se}/25 ;;
-
-		d7)	echo ${se}/32 ;;
-		d8)	echo ${se}/33 ;;
-		d9)	echo ${se}/34 ;;
-		da)	echo ${se}/35 ;;
-
-		e5)	echo ${se}/40 ;;
-		e6)	echo ${se}/41 ;;
-		e7)	echo ${se}/42 ;;
-		e8)	echo ${se}/43 ;;
-		e9)	echo ${se}/44 ;;
-
-		# This hex
-		*)	echo ${kingdom}/$1 ;;	
-	esac
-}
--->
-
-<script type="text/javascript">
-drawmap();
-</script>
-
-</body></html>
+<body onload="drawmap();">
+</body>
+</html>
