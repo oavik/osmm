@@ -120,22 +120,22 @@ header() {
 	tr -d '\n' <<-EOH
 		<!DOCTYPE html>
 		<html><head><meta charset="utf-8"><title>Kingdom Map: $1</title>
-		<link rel="stylesheet" href="map.css">
 		<style type="text/css">
-		img {
-			display: inline;
-			width: 60px ! important;
-			height: 60px ! important;
+		* {
 			border: none;
 			margin: 0;
 			padding: 0;
 			white-space: nowrap;
 		}
+		img {
+			display: inline;
+			width: 60px ! important;
+			height: 60px ! important;
+		}
 		div:nth-child(1) {
 			margin-top: -45px;
 		}
 		div:nth-child(even) {
-			/* padding-left: 30px; */
 			margin-left: -30px;
 		}
 		div + div {
@@ -169,7 +169,7 @@ tiles () {
 		done
 		if [ $odd -eq 0 ]; then
 			odd=1
-			addtile $i $j
+			addtile $i a
 		else
 			odd=0
 		fi
