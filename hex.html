@@ -5,7 +5,6 @@
 <title>Map</title>
 <style type="text/css">
 * { overflow: hidden; border: none; margin: 0; padding: 0; white-space: nowrap; }
-img { opacity: 0.5 }
 </style>
 <script type="text/javascript"><!--
 var hexsize = 60;
@@ -21,11 +20,10 @@ function getjson(path, action)
 
 function gettile(x, y)
 {
-	var terrain = ["grass", "desert", "ocean", "lake", "hill", "mountain"];
 	var img = document.createElement("img");
-	img.src = terrain[Math.floor((Math.random() * terrain.length)) % terrain.length] + ".png";
+	img.src = "unknown.png";
 	img.id = "i" + x + "-" + y;
-	img.useMap = "#a" + x + "-" + y;
+	img.useMap = "#m" + x + "-" + y;
 	img.style.display = "inline";
 	img.style.width = hexsize + "px";
 	img.style.height = hexsize + "px";
@@ -43,13 +41,13 @@ function getclickarea(x, y)
 
 	var map = document.createElement("map");
 	map.style.display = "none";
-	map.name = "a" + x + "-" + y;
+	map.name = "m" + x + "-" + y;
 
 	var area = document.createElement("area");
-	area.style.display = "none";
+	area.id = "a" + x + "-" + y;
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
-	area.href = "#" + x + "/" + y;
+	//area.href = "#NO" + x + "/" + y;
 	area.onClick = "recenter();";
 	area.ondblclick = "zoomto();";
 	map.appendChild(area);
@@ -102,22 +100,24 @@ function drawhexes()
 {
 	var hexwidth = window.innerWidth / hexsize;
 	var hexheight = window.innerHeight / (hexsize * 3 / 4);
+	centerhex.x = Math.floor(hexwidth / 2);
+	centerhex.y = Math.floor(hexheight / 2);
 	drawmap(Math.ceil(hexwidth), Math.ceil(hexheight) + 1);
+}
+
+function settile(x, y, terrain, href)
+{
+	var tile = document.getElementById("i" + x + "-" + y);
+	var area = document.getElementById("a" + x + "-" + y);
+	tile.src = terrain;
+	area.href = href;
 }
 
 function worldmap()
 {
 	var world = JSON.parse(this.responseText);
-	if (centerhex.x == -1) {
-		centerhex.x = Math.floor(world.width / 2);
-	}
-	if (centerhex.y == -1) {
-		centerhex.y = Math.floor(world.height / 2);
-	}
-	console.log(world);
-	console.log(centerhex);
-	var centertile = document.getElementById("i" + centerhex.x + "-" + centerhex.y);
-	centertile.style.opacity = 1.0;
+
+	settile(centerhex.x, centerhex.y, "grass.png", "#" + centerhex.x + "/" + centerhex.y);
 }
 
 function recenter()
