@@ -114,7 +114,7 @@ addtile () {
 	elif [ -f $(dirname ${tiledir})/terrain ]; then
 		terrain=$(cat $(dirname ${tiledir})/terrain)
 	else
-		terrain=unkown
+		terrain=unknown
 	fi
 	printf '<img id="i%c%c" src="%s.png" usemap="#a%c%c">' $1 $2 $terrain $1 $2
 	printf '<map name="a%c%c"><area shape="poly" coords="%s" href="%s"></map>' $1 $2 "${coords}" "${tiledir}"
