@@ -1,14 +1,10 @@
 #!/bin/sh
 
-nw_hexes="00 01 02 03 04 10 11 12 13 20 21 30"
 nw_halves="14 22 31"
-ne_hexes="05 06 07 08 09 17 18 19 1a 28 29 2a 3a"
 ne_halves="16 27 39"
 ww_halves="50 70 90"
 ee_halves="5a 7a 9a"
-sw_hexes="b0 c0 c1 d0 d1 d2 d3 e0 e1 e2 e3 e4"
 sw_halves="b1 c2 d4"
-se_hexes="ba c8 c9 ca d7 d8 d9 da e5 e6 e7 e8 e9"
 se_halves="b9 c7 d6"
 
 coord_nw="0,15"
