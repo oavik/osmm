@@ -28,82 +28,82 @@ sw_kingdom=$(cat ${kingdom}/SW)
 se_kingdom=$(cat ${kingdom}/SE)
 
 resolve () {
-	nw=${nw_kingdom:-UNKNOWN-${kingdrom}-NW}
-	ne=${ne_kingdom:-UNKNOWN-${kingdrom}-NE}
-	sw=${sw_kingdom:-UNKNOWN-${kingdrom}-SW}
-	se=${se_kingdom:-UNKNOWN-${kingdrom}-SE}
+	nw=${nw_kingdom:-UNKNOWN-${kingdom}-NW}
+	ne=${ne_kingdom:-UNKNOWN-${kingdom}-NE}
+	sw=${sw_kingdom:-UNKNOWN-${kingdom}-SW}
+	se=${se_kingdom:-UNKNOWN-${kingdom}-SE}
 	case $1 in
 		# Northwest
-		00)	echo ${nw}-00 ;;
-		01)	echo ${nw}-01 ;;
-		02)	echo ${nw}-02 ;;
-		03)	echo ${nw}-03 ;;
-		04)	echo ${nw}-04 ;;
+		00)	echo ${nw}/00 ;;
+		01)	echo ${nw}/01 ;;
+		02)	echo ${nw}/02 ;;
+		03)	echo ${nw}/03 ;;
+		04)	echo ${nw}/04 ;;
 
-		10)	echo ${nw}-b5 ;;
-		11)	echo ${nw}-b6 ;;
-		12)	echo ${nw}-b7 ;;
-		13)	echo ${nw}-b8 ;;
+		10)	echo ${nw}/b5 ;;
+		11)	echo ${nw}/b6 ;;
+		12)	echo ${nw}/b7 ;;
+		13)	echo ${nw}/b8 ;;
 
-		20)	echo ${nw}-c5 ;;
-		21)	echo ${nw}-c6 ;;
+		20)	echo ${nw}/c5 ;;
+		21)	echo ${nw}/c6 ;;
 
-		30)	echo ${nw}-d5 ;;
+		30)	echo ${nw}/d5 ;;
 
 		# Northeast
-		05)	echo ${ne}-a0 ;;
-		06)	echo ${ne}-a1 ;;
-		07)	echo ${ne}-a2 ;;
-		08)	echo ${ne}-a3 ;;
-		09)	echo ${ne}-a4 ;;
+		05)	echo ${ne}/a0 ;;
+		06)	echo ${ne}/a1 ;;
+		07)	echo ${ne}/a2 ;;
+		08)	echo ${ne}/a3 ;;
+		09)	echo ${ne}/a4 ;;
 
-		17)	echo ${ne}-b2 ;;
-		18)	echo ${ne}-b3 ;;
-		19)	echo ${ne}-b4 ;;
-		1a)	echo ${ne}-b5 ;;
+		17)	echo ${ne}/b2 ;;
+		18)	echo ${ne}/b3 ;;
+		19)	echo ${ne}/b4 ;;
+		1a)	echo ${ne}/b5 ;;
 
-		28)	echo ${ne}-c3 ;;
-		29)	echo ${ne}-c4 ;;
+		28)	echo ${ne}/c3 ;;
+		29)	echo ${ne}/c4 ;;
 
-		3a)	echo ${ne}-d5 ;;
+		3a)	echo ${ne}/d5 ;;
 
 		# Southwest
-		b0)	echo ${sw}-15 ;;
+		b0)	echo ${sw}/15 ;;
 
-		c0)	echo ${sw}-25 ;;
-		c1)	echo ${sw}-26 ;;
+		c0)	echo ${sw}/25 ;;
+		c1)	echo ${sw}/26 ;;
 
-		d0)	echo ${sw}-35 ;;
-		d1)	echo ${sw}-36 ;;
-		d2)	echo ${sw}-37 ;;
-		d3)	echo ${sw}-38 ;;
+		d0)	echo ${sw}/35 ;;
+		d1)	echo ${sw}/36 ;;
+		d2)	echo ${sw}/37 ;;
+		d3)	echo ${sw}/38 ;;
 
-		e0)	echo ${sw}-45 ;;
-		e1)	echo ${sw}-46 ;;
-		e2)	echo ${sw}-47 ;;
-		e3)	echo ${sw}-48 ;;
-		e4)	echo ${sw}-49 ;;
+		e0)	echo ${sw}/45 ;;
+		e1)	echo ${sw}/46 ;;
+		e2)	echo ${sw}/47 ;;
+		e3)	echo ${sw}/48 ;;
+		e4)	echo ${sw}/49 ;;
 
 		# Southeast
-		ba)	echo ${se}-15 ;;
+		ba)	echo ${se}/15 ;;
 
-		c8)	echo ${se}-23 ;;
-		c9)	echo ${se}-24 ;;
-		ca)	echo ${se}-25 ;;
+		c8)	echo ${se}/23 ;;
+		c9)	echo ${se}/24 ;;
+		ca)	echo ${se}/25 ;;
 
-		d7)	echo ${se}-32 ;;
-		d8)	echo ${se}-33 ;;
-		d9)	echo ${se}-34 ;;
-		da)	echo ${se}-35 ;;
+		d7)	echo ${se}/32 ;;
+		d8)	echo ${se}/33 ;;
+		d9)	echo ${se}/34 ;;
+		da)	echo ${se}/35 ;;
 
-		e5)	echo ${se}-40 ;;
-		e6)	echo ${se}-41 ;;
-		e7)	echo ${se}-42 ;;
-		e8)	echo ${se}-43 ;;
-		e9)	echo ${se}-44 ;;
+		e5)	echo ${se}/40 ;;
+		e6)	echo ${se}/41 ;;
+		e7)	echo ${se}/42 ;;
+		e8)	echo ${se}/43 ;;
+		e9)	echo ${se}/44 ;;
 
 		# This hex
-		*)	echo $1 ;;	
+		*)	echo ${kingdom}/$1 ;;	
 	esac
 }
 
