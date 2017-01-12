@@ -79,6 +79,29 @@ function createtile(y, x)
 	return img;
 }
 
+function zoominto(e)
+{
+	console.log("zoominto");
+	console.log(e);
+	return false;
+}
+
+function scrollto(e)
+{
+	console.log(e.target.href);
+	var hash = e.target.href.indexOf("#");
+	var slash = e.target.href.lastIndexOf("/");
+	if (hash == undefined || slash == undefined) {
+		return true;
+	}
+	var y = e.target.href.substr(hash + 2, slash - hash - 2);
+	var x = e.target.href.substr(slash + 1);
+	localStorage.setItem("center.y", y);
+	localStorage.setItem("center.x", x);
+	recenter();
+	return false;
+}
+
 function createclickarea(y, x)
 {
 	var coord_nw = "0," + (hexsize/4);
@@ -96,8 +119,10 @@ function createclickarea(y, x)
 	area.id = "a" + y + "-" + x;
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
-	area.onClick = "zoomto();";
-	area.ondblclick = "zoomto();";
+	area.onClick = "javascript:zoomto();return false;";
+	area.addEventListener("click", scrollto, 0);
+	area.addEventListener("dblclick", zoominto, 0);
+	area.oncontextmenu = "javascript:rightclick();return false;";
 	area.href="#not" + y + "/" + x;
 	map.appendChild(area);
 
@@ -108,6 +133,15 @@ function zoomto(e)
 {
 	console.log("zooming to");
 	console.log(e);
+	return false;
+}
+
+
+function rightclick(e)
+{
+	console.log("rightclick");
+	console.log(e);
+	return false;
 }
 
 function drawhexes()
