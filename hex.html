@@ -10,14 +10,13 @@
 var hexsize = 60;
 var hexdisplay = { width: 0, height: 0 };
 var centerhex = { x: -1, y: -1 };
-var offset = { x: 0, y: 0 };
+//var offset = { x: 0, y: 0 };
 
 function setdefault(key, value) {
 	if (localStorage.getItem(key) == undefined) {
 		localStorage.setItem(key, value);
 	}
 }
-
 
 function getterrain(scale, y, x)
 {
@@ -79,6 +78,26 @@ function createtile(y, x)
 	return img;
 }
 
+function getclickedx(e)
+{
+	var hash = e.target.href.indexOf("#");
+	var slash = e.target.href.lastIndexOf("/");
+	if (hash == undefined || slash == undefined) {
+		return -1;
+	}
+	return parseInt(e.target.href.substr(slash + 1));
+}
+
+function getclickedy(e)
+{
+	var hash = e.target.href.indexOf("#");
+	var slash = e.target.href.lastIndexOf("/");
+	if (hash == undefined || slash == undefined) {
+		return -1;
+	}
+	return parseInt(e.target.href.substr(hash + 2, slash - hash - 2));
+}
+
 function zoominto(e)
 {
 	console.log("zoominto");
@@ -88,17 +107,37 @@ function zoominto(e)
 
 function scrollto(e)
 {
-	console.log(e.target.href);
-	var hash = e.target.href.indexOf("#");
-	var slash = e.target.href.lastIndexOf("/");
-	if (hash == undefined || slash == undefined) {
-		return true;
+	var x = getclickedx(e);
+	var y = getclickedy(e);
+	if (x != -1 && y != -1) {
+		localStorage.setItem("center.y", y);
+		localStorage.setItem("center.x", x);
+		recenter();
 	}
-	var y = e.target.href.substr(hash + 2, slash - hash - 2);
-	var x = e.target.href.substr(slash + 1);
-	localStorage.setItem("center.y", y);
-	localStorage.setItem("center.x", x);
-	recenter();
+	return false;
+}
+
+function rightclick(e)
+{
+	e.preventDefault();
+	var x = getclickedx(e);
+	var y = getclickedy(e);
+	if (x != -1 && y != -1) {
+		var cycle = [ "unknown", "grass", "desert", "lake", "ocean", "hill", "mountain" ];
+		var next = cycle[0];
+		var current = getterrain(getscale(), y, x);
+		for (var i = 0; i < cycle.length; i++) {
+			if (current == cycle[i]) {
+				next = cycle[i+1];
+				break;
+			}
+		}
+		if (next == undefined) {
+			next = cycle[0];
+		}
+		setterrain(getscale(), y, x, next);
+		recenter();
+	}
 	return false;
 }
 
@@ -119,29 +158,13 @@ function createclickarea(y, x)
 	area.id = "a" + y + "-" + x;
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
-	area.onClick = "javascript:zoomto();return false;";
-	area.addEventListener("click", scrollto, 0);
-	area.addEventListener("dblclick", zoominto, 0);
-	area.oncontextmenu = "javascript:rightclick();return false;";
+	area.addEventListener("click", scrollto);
+	area.addEventListener("dblclick", zoominto);
+	area.addEventListener("contextmenu", rightclick);
 	area.href="#not" + y + "/" + x;
 	map.appendChild(area);
 
 	return map;
-}
-
-function zoomto(e)
-{
-	console.log("zooming to");
-	console.log(e);
-	return false;
-}
-
-
-function rightclick(e)
-{
-	console.log("rightclick");
-	console.log(e);
-	return false;
 }
 
 function drawhexes()
@@ -197,8 +220,6 @@ function settile(y, x, terrain, href)
 
 function recenter()
 {
-	setterrain("continent", 133, 200, "grass");
-
 	console.log(localStorage);
 	console.log(hexdisplay);
 	var scale = getscale();
@@ -221,7 +242,7 @@ function recenter()
 }
 
 function init() {
-	localStorage.clear();
+	//localStorage.clear();
 	setdefault("scale", "continent");
 	setdefault("world.width", 400);
 	setdefault("world.height", 267);
