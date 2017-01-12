@@ -8,6 +8,7 @@
 </style>
 <script type="text/javascript"><!--
 var hexsize = 60;
+var hexdisplay = { width: 0, height: 0 };
 var centerhex = { x: -1, y: -1 };
 var offset = { x: 0, y: 0 };
 
@@ -99,16 +100,16 @@ function drawmap(width, height)
 
 function drawhexes()
 {
-	var hexwidth = window.innerWidth / hexsize;
-	var hexheight = window.innerHeight / (hexsize * 3 / 4);
-	centerhex.x = Math.floor(hexwidth / 2);
-	centerhex.y = Math.floor(hexheight / 2);
-	drawmap(Math.ceil(hexwidth), Math.ceil(hexheight) + 1);
+	hexdisplay.width = window.innerWidth / hexsize;
+	hexdisplay.height = window.innerHeight / (hexsize * 3 / 4);
+	centerhex.x = Math.floor(hexdisplay.width / 2);
+	centerhex.y = Math.floor(hexdisplay.height / 2);
+	drawmap(Math.ceil(hexdisplay.width), Math.ceil(hexdisplay.height) + 1);
 }
 
 function settile(x, y, terrain, href)
 {
-	console.log("Setting tile " + x + "," + y);
+	console.log("Setting tile " + x + "," + y + " to " + terrain);
 	var tile = document.getElementById("i" + x + "-" + y);
 	var area = document.getElementById("a" + x + "-" + y);
 	tile.src = terrain + ".png";
@@ -117,6 +118,9 @@ function settile(x, y, terrain, href)
 
 function fixtile()
 {
+	if (this.status != 200) {
+		return false;
+	}
 	var tileparts = this.responseURL.split("/");
 	console.log(tileparts);
 	/* start at .json, count back two slashes */
@@ -127,7 +131,7 @@ function fixtile()
 	var x = tileparts[tileparts.length-2];
 	var y = tileparts[tileparts.length-1].substr(0, tileparts[tileparts.length-1].indexOf(".json"));
 	console.log(x + "," + y);
-	settile(x - offset.x, y - offset.y, this.responseText, this.reponseURL);
+	settile(x - offset.x, y - offset.y, this.responseText, "#" + x + "/" + y);
 }
 
 function worldmap()
@@ -141,22 +145,29 @@ function worldmap()
 	offset.x = worldcenterx - centerhex.x;
 	offset.y = worldcentery - centerhex.y;
 
-	//settile(centerhex.x, centerhex.y, "grass", "#" + worldcenterx + "/" + worldcentery);
-	getjson("/200/132.json", fixtile);
-	getjson("/200/133.json", fixtile);
-	getjson("/200/134.json", fixtile);
+	console.log("WCX: " + worldcenterx);
+	console.log("WCY: " + worldcentery);
+	console.log("Width: " + Math.ceil(hexdisplay.width / 2));
+	console.log("Height: " + Math.ceil(hexdisplay.height / 2));
+	for (var i = worldcenterx - Math.ceil(hexdisplay.width / 2); i < worldcenterx + Math.ceil(hexdisplay.width / 2); i++) {
+		console.log(i);
+		for (var j = worldcentery - Math.ceil(hexdisplay.height / 2); i < worldcentery + Math.ceil(hexdisplay.height / 2); i++) {
+			console.log(i + "/" + j);
+			getjson("/" + i + "/" + j + ".json", fixtile);
+		}
+	}
 }
 
 function recenter()
 {
-	if (window.location.href.indexOf("#") == -1) {
+	//if (window.location.href.indexOf("#") == -1) {
 		getjson("/world.json", worldmap);
-	} else {
-		console.log("Map of " + hash);
-		var hash = window.location.href.substring(window.location.href.indexOf("#") + 1);
-		var centerhex = hash.split("/");
-		console.log(centerhex);
-	}
+	//} else {
+		//console.log("Map of " + hash);
+		//var hash = window.location.href.substring(window.location.href.indexOf("#") + 1);
+		//var centerhex = hash.split("/");
+		//console.log(centerhex);
+	//}
 }
 
 // --></script>
