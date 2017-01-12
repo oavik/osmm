@@ -18,11 +18,6 @@ function setdefault(key, value) {
 	}
 }
 
-setdefault("scale", "continent");
-setdefault("world.width", 400);
-setdefault("world.height", 267);
-setdefault("center.x", 200);
-setdefault("center.y", 133);
 
 function getterrain(scale, y, x)
 {
@@ -62,6 +57,7 @@ function setterrain(scale, y, x, terrain)
 	}
 }
 
+
 function getscale()
 {
 	if (localStorage.getItem("scale") == undefined) {
@@ -100,7 +96,7 @@ function createclickarea(y, x)
 	area.id = "a" + y + "-" + x;
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
-	area.onClick = "recenter();";
+	area.onClick = "zoomto();";
 	area.ondblclick = "zoomto();";
 	area.href="#not" + y + "/" + x;
 	map.appendChild(area);
@@ -165,12 +161,10 @@ function settile(y, x, terrain, href)
 	if (area) area.href = href;
 }
 
-function drawterrain(scale, cy, cx)
-{
-}
-
 function recenter()
 {
+	setterrain("continent", 133, 200, "grass");
+
 	console.log(localStorage);
 	console.log(hexdisplay);
 	var scale = getscale();
@@ -186,14 +180,54 @@ function recenter()
 
 	for (var i = uppertile; i <= lowertile; i++) {
 		for (var j = lefttile; j <= righttile; j++) {
-			settile(i - yoffset, j - xoffset, getterrain(scale, i + "/" + j), "#" + scale + i + "/" + j);
+			settile(i - yoffset, j - xoffset, getterrain(scale, i, j), "#" + scale[0] + i + "/" + j);
 		}
 	}
 	
 }
 
+function init() {
+	localStorage.clear();
+	setdefault("scale", "continent");
+	setdefault("world.width", 400);
+	setdefault("world.height", 267);
+	setdefault("center.x", 200);
+	setdefault("center.y", 133);
+
+	window.onkeyup = function(e) {
+		var key = e.keyCode ? e.keyCode : e.which;
+		switch (key) {
+		case 37: //left
+			localStorage.setItem("center.x", parseInt(localStorage.getItem("center.x")) - 1);
+			recenter();
+			break;
+
+		case 38: //up
+			localStorage.setItem("center.y", parseInt(localStorage.getItem("center.y")) - 1);
+			recenter();
+			break;
+
+		case 39: //right
+			localStorage.setItem("center.x", parseInt(localStorage.getItem("center.x")) + 1);
+			recenter();
+			break;
+
+		case 40: //down
+			localStorage.setItem("center.y", parseInt(localStorage.getItem("center.y")) + 1);
+			recenter();
+			break;
+
+		default:
+			return false;
+		}
+	}
+
+	drawhexes();
+	recenter();
+}
+
 // --></script>
 </head>
-<body onload="drawhexes(); recenter();">
+<body onload="init();">
 </body>
 </html>
