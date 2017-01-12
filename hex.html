@@ -21,58 +21,45 @@ function setdefault(key, value) {
 setdefault("scale", "continent");
 setdefault("world.width", 400);
 setdefault("world.height", 267);
-setdefault("center.continent.x", 200);
-setdefault("center.continent.y", 133);
-setdefault("center.kingdom.x", 6);
-setdefault("center.kingdom.y", 7);
-setdefault("center.province.x", 3);
-setdefault("center.province.y", 4);
+setdefault("center.x", 200);
+setdefault("center.y", 133);
 
-function setcontinent(continent, terrain)
+function getterrain(scale, y, x)
 {
-	localStorage.setItem("tile/" + continent, terrain);
-}
-
-function getcontinent(continent)
-{
-	var t = localStorage.getItem("tile/" + continent);
-	if (t != undefined) {
-		return "unknown";
+	if (scale == "province") {
+		var p = localStorage.getItem("p" + y + "/" + x);
+		if (p) {
+			return p;
+		}
+		scale = "kingdom";
+		(y, x) = getparentkingdom(y, x);
 	}
-	return t;
-}
 
-function setkingdom(continent, kingdom, terrain)
-{
-	localStorage.setItem("tile/" + continent + "/" + kingdom, terrain);
-}
-
-function getkingdom(continent, kingdom)
-{
-	var t = localStorage.getItem("tile/" + continent + "/" + kingdom);
-	if (t == undefined) {
-		return getcontinent(continent);
+	if (scale == "kingdom") {
+		var k = localStorage.getItem("k" + y + "/" + x);
+		if (k) {
+			return k;
+		}
+		(y, x) = getparentcontinent(y, x);
 	}
-	return t;
-}
 
-function setprovince(continent, kingdom, province, terrain)
-{
-	localStorage.setItem("tile/" + continent + "/" + kingdom + "/" + province, terrain);
-}
-
-function getprovince(continent, kingdom, province)
-{
-	var t = localStorage.getItem("tile/" + continent + "/" + kingdom + "/" + province);
-	if (t == undefined) {
-		return getkingdom(continent, kingdom);
+	var c = localStorage.getItem("c" + y + "/" + x);
+	if (c) {
+		return c;
 	}
-	return t;
+
+	return "unknown";
 }
 
-function setscale(scale)
+function setterrain(scale, y, x, terrain)
 {
-	localStorage.setItem("scale", scale);
+	if (scale == "province") {
+		localStorage.setItem("p" + y + "/" + x, terrain);
+	} else if (scale == "kingdom") {
+		localStorage.setItem("k" + y + "/" + x, terrain);
+	} else {
+		localStorage.setItem("c" + y + "/" + x, terrain);
+	}
 }
 
 function getscale()
@@ -83,17 +70,12 @@ function getscale()
 	return localStorage.getItem("scale");
 }
 
-function fillthis(e)
-{
-	console.log(e);
-}
-
-function createtile(x, y)
+function createtile(y, x)
 {
 	var img = document.createElement("img");
 	img.src = "unknown.png";
-	img.id = "i" + x + "-" + y;
-	img.useMap = "#m" + x + "-" + y;
+	img.id = "i" + y + "-" + x;
+	img.useMap = "#m" + y + "-" + x;
 	img.style.display = "inline";
 	img.style.width = hexsize + "px";
 	img.style.height = hexsize + "px";
@@ -101,7 +83,7 @@ function createtile(x, y)
 	return img;
 }
 
-function createclickarea(x, y)
+function createclickarea(y, x)
 {
 	var coord_nw = "0," + (hexsize/4);
 	var coord_nn = (hexsize/2) + ",0";
@@ -112,14 +94,15 @@ function createclickarea(x, y)
 
 	var map = document.createElement("map");
 	map.style.display = "none";
-	map.name = "m" + x + "-" + y;
+	map.name = "m" + y + "-" + x;
 
 	var area = document.createElement("area");
-	area.id = "a" + x + "-" + y;
+	area.id = "a" + y + "-" + x;
 	area.shape = "poly";
 	area.coords = coord_nw + "," + coord_nn + "," + coord_ne + "," + coord_se + "," + coord_ss + "," + coord_sw;
 	area.onClick = "recenter();";
 	area.ondblclick = "zoomto();";
+	area.href="#not" + y + "/" + x;
 	map.appendChild(area);
 
 	return map;
@@ -133,12 +116,12 @@ function zoomto(e)
 
 function drawhexes()
 {
-	hexdisplay.width = window.innerWidth / hexsize;
-	hexdisplay.height = window.innerHeight / (hexsize * 3 / 4);
+	hexdisplay.width = Math.ceil(window.innerWidth / hexsize) + 1;
+	hexdisplay.height = Math.ceil(window.innerHeight / (hexsize * 3 / 4)) + 1;
 	centerhex.x = Math.floor(hexdisplay.width / 2);
 	centerhex.y = Math.floor(hexdisplay.height / 2);
-	var width = Math.ceil(hexdisplay.width);
-	var height = Math.ceil(hexdisplay.height) + 1;
+	var width = hexdisplay.width;
+	var height = hexdisplay.height;
 	var body = document.getElementsByTagName("body");
 
 	for (var i = 0; i < height; i++) {
@@ -173,68 +156,40 @@ function drawhexes()
 	*/
 }
 
-function settile(x, y, terrain, href)
+function settile(y, x, terrain, href)
 {
-	console.log("Setting tile " + x + "," + y + " to " + terrain);
-	var tile = document.getElementById("i" + x + "-" + y);
-	var area = document.getElementById("a" + x + "-" + y);
-	tile.src = terrain + ".png";
-	area.href = href;
+	//console.log("Setting tile " + y + "/" + x + " to " + terrain);
+	var tile = document.getElementById("i" + y + "-" + x);
+	var area = document.getElementById("a" + y + "-" + x);
+	if (tile) tile.src = terrain + ".png";
+	if (area) area.href = href;
 }
 
-function fixtile()
+function drawterrain(scale, cy, cx)
 {
-	if (this.status != 200) {
-		return false;
-	}
-	var tileparts = this.responseURL.split("/");
-	console.log(tileparts);
-	/* start at .json, count back two slashes */
-	/* if more, count back two more */
-	/* if more, count back two more */
-	//console.log(this.responseText);
-	//var tile = JSON.parse(this.responseText);
-	var x = tileparts[tileparts.length-2];
-	var y = tileparts[tileparts.length-1].substr(0, tileparts[tileparts.length-1].indexOf(".json"));
-	//console.log(x + "," + y);
-	settile(x - offset.x, y - offset.y, this.responseText, "#" + x + "/" + y);
-}
-
-function worldmap()
-{
-	var world = { width: 400, height: 267 };
-	if (this.status == 200) {
-		world = JSON.parse(this.responseText);
-	}
-	var worldcenterx = Math.floor(world.width / 2);
-	var worldcentery = Math.floor(world.height / 2);
-	offset.x = worldcenterx - centerhex.x;
-	offset.y = worldcentery - centerhex.y;
-
-	//console.log("WCX: " + worldcenterx);
-	//console.log("WCY: " + worldcentery);
-	//console.log("Width: " + Math.ceil(hexdisplay.width / 2));
-	//console.log("Height: " + Math.ceil(hexdisplay.height / 2));
-	for (var i = worldcenterx - Math.ceil(hexdisplay.width / 2); i < worldcenterx + Math.ceil(hexdisplay.width / 2); i++) {
-		//console.log(i);
-		for (var j = worldcentery - Math.ceil(hexdisplay.height / 2); i < worldcentery + Math.ceil(hexdisplay.height / 2); i++) {
-			//console.log(i + "/" + j);
-			getjson("/" + i + "/" + j + ".json", fixtile);
-		}
-	}
 }
 
 function recenter()
 {
 	console.log(localStorage);
-	//if (window.location.href.indexOf("#") == -1) {
-		//getjson("/world.json", worldmap);
-	//} else {
-		//console.log("Map of " + hash);
-		//var hash = window.location.href.substring(window.location.href.indexOf("#") + 1);
-		//var centerhex = hash.split("/");
-		//console.log(centerhex);
-	//}
+	console.log(hexdisplay);
+	var scale = getscale();
+	var cx = localStorage.getItem("center.x");
+	var cy = localStorage.getItem("center.y");
+
+	var xoffset = cx - centerhex.x;
+	var yoffset = cy - centerhex.y;
+	var lefttile = cx - Math.ceil(hexdisplay.width / 2);
+	var righttile = lefttile + hexdisplay.width;
+	var uppertile = cy - Math.ceil(hexdisplay.height / 2);
+	var lowertile = uppertile + hexdisplay.height;
+
+	for (var i = uppertile; i <= lowertile; i++) {
+		for (var j = lefttile; j <= righttile; j++) {
+			settile(i - yoffset, j - xoffset, getterrain(scale, i + "/" + j), "#" + scale + i + "/" + j);
+		}
+	}
+	
 }
 
 // --></script>
