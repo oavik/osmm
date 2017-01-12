@@ -211,7 +211,6 @@ function drawhexes()
 
 function settile(y, x, terrain, href)
 {
-	//console.log("Setting tile " + y + "/" + x + " to " + terrain);
 	var tile = document.getElementById("i" + y + "-" + x);
 	var area = document.getElementById("a" + y + "-" + x);
 	if (tile) tile.src = terrain + ".png";
@@ -220,8 +219,6 @@ function settile(y, x, terrain, href)
 
 function recenter()
 {
-	console.log(localStorage);
-	console.log(hexdisplay);
 	var scale = getscale();
 	var cx = localStorage.getItem("center.x");
 	var cy = localStorage.getItem("center.y");
